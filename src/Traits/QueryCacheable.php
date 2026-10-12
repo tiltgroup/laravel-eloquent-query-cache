@@ -28,12 +28,14 @@ trait QueryCacheable
      */
     public static function bootQueryCacheable()
     {
-        /** @var \Illuminate\Database\Eloquent\Model $this */
-        if (isset(static::$flushCacheOnUpdate) && static::$flushCacheOnUpdate) {
-            static::observe(
-                static::getFlushQueryCacheObserver()
-            );
+        if (! isset(static::$flushCacheOnUpdate) || ! static::$flushCacheOnUpdate) {
+            return;
         }
+
+        $observe = fn () => static::observe(static::getFlushQueryCacheObserver());
+
+        // Laravel 13 forbids instantiating a model while it boots, and observe() does.
+        method_exists(static::class, 'whenBooted') ? static::whenBooted($observe) : $observe();
     }
 
     /**
