@@ -15,8 +15,10 @@ abstract class TestCase extends Orchestra
     {
         parent::setUp();
 
-        if ($this->getProvidedData() && method_exists(Model::class, 'preventAccessingMissingAttributes')) {
-            [$strict] = $this->getProvidedData();
+        $providedData = method_exists($this, 'providedData') ? $this->providedData() : $this->getProvidedData();
+
+        if ($providedData && method_exists(Model::class, 'preventAccessingMissingAttributes')) {
+            [$strict] = $providedData;
             Model::preventAccessingMissingAttributes($strict);
         }
 
@@ -29,6 +31,14 @@ abstract class TestCase extends Orchestra
         $this->withFactories(__DIR__.'/database/factories');
 
         $this->artisan('migrate', ['--database' => 'sqlite']);
+    }
+
+    /**
+     * Laravel 13 started quoting the aggregate alias in the compiled SQL that cache keys are built from.
+     */
+    protected function aggregateAlias(): string
+    {
+        return version_compare($this->app->version(), '13.0.0', '>=') ? '"aggregate"' : 'aggregate';
     }
 
     /**

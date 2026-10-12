@@ -5,6 +5,7 @@ namespace Rennokki\QueryCache\Test;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Rennokki\QueryCache\Test\Models\Post;
 
 class LivewireTest extends TestCase
@@ -12,6 +13,7 @@ class LivewireTest extends TestCase
     /**
      * @dataProvider strictModeContextProvider
      */
+    #[DataProvider('strictModeContextProvider')]
     public function test_livewire_component_poll_doesnt_break_when_callback_is_already_set()
     {
         // See: https://github.com/renoki-co/laravel-eloquent-query-cache/issues/163
